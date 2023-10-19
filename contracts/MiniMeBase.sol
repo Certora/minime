@@ -66,9 +66,6 @@ abstract contract MiniMeBase is Controlled, IERC20, IERC20Permit, EIP712, Nonces
     //  it will be 0x0 for a token that was not cloned
     MiniMeBase public immutable parentToken;
 
-    // Flag that determines if the token is transferable or not.
-    bool public transfersEnabled;
-
     // `parentSnapShotBlock` is the block number from the Parent Token that was
     //  used to determine the initial distribution of the Clone Token
     uint256 public immutable parentSnapShotBlock;
@@ -86,6 +83,9 @@ abstract contract MiniMeBase is Controlled, IERC20, IERC20Permit, EIP712, Nonces
 
     // Tracks the history of the `totalSupply` of the token
     Checkpoint[] private totalSupplyHistory;
+
+    // Flag that determines if the token is transferable or not.
+    bool public transfersEnabled;
 
     /// @notice Constructor to create a MiniMeBase
     /// @param _parentToken Address of the parent token, set to 0x0 if it is a
