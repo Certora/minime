@@ -49,7 +49,7 @@ abstract contract MiniMeBase is Controlled, IERC20, IERC20Permit, EIP712, Nonces
     uint8 public immutable decimals; //Number of decimals of the smallest unit
     string public symbol; //An identifier: e.g. REP
     string public constant TOKEN_VERSION = "MMT_0.2"; //An arbitrary versioning scheme
-    bytes32 private constant PERMIT_TYPEHASH =
+    bytes32 private immutable PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
     /// @dev `Checkpoint` is the structure that attaches a block number to a
@@ -65,6 +65,9 @@ abstract contract MiniMeBase is Controlled, IERC20, IERC20Permit, EIP712, Nonces
     // `parentToken` is the Token address that was cloned to produce this token;
     //  it will be 0x0 for a token that was not cloned
     MiniMeBase public immutable parentToken;
+
+    // Flag that determines if the token is transferable or not.
+    bool public transfersEnabled;
 
     // `parentSnapShotBlock` is the block number from the Parent Token that was
     //  used to determine the initial distribution of the Clone Token
@@ -83,9 +86,6 @@ abstract contract MiniMeBase is Controlled, IERC20, IERC20Permit, EIP712, Nonces
 
     // Tracks the history of the `totalSupply` of the token
     Checkpoint[] private totalSupplyHistory;
-
-    // Flag that determines if the token is transferable or not.
-    bool public transfersEnabled;
 
     /// @notice Constructor to create a MiniMeBase
     /// @param _parentToken Address of the parent token, set to 0x0 if it is a
@@ -418,7 +418,7 @@ abstract contract MiniMeBase is Controlled, IERC20, IERC20Permit, EIP712, Nonces
         if (_block < checkpoints[0].fromBlock) return 0;
 
         // Binary search of the value in the array
-        uint256 sMin = 0;
+        uint256 sMin;
         uint256 max = len - 1;
         while (max > sMin) {
             uint256 mid = (max + sMin + 1) / 2;
